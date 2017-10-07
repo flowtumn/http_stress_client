@@ -1,5 +1,7 @@
 #include "socket/socket_win.h"
 
+#ifdef _WIN32
+
 #include <WinSock2.h>
 
 using namespace TrainingTask;
@@ -119,3 +121,5 @@ bool SocketWin::connect(const std::string& host, int port) {
     }
     return false;
 }
+
+#endif
