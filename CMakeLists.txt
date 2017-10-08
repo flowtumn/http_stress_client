@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.0)
 
-project(tcp_get)
+project(http_stress_client)
 
 set(CMAKE_CXX_STANDARD 14)
 
