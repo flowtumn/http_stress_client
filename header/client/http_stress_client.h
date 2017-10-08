@@ -1,41 +1,42 @@
 ﻿#ifndef HTTP_STRESS_CLIENT_H_INCLUDE__
 #define HTTP_STRESS_CLIENT_H_INCLUDE__
 
-#include <functional>
-#include <memory>
+#include <atomic>
+#include <cstdint>
 #include "socket/isocket.h"
 
 namespace TrainingTask {
-    struct StressObserver {
-        bool connection;
-        int connectionError;
-        int responseCode;
-    };
-
-    template <typename _Socket>
     class HttpStressClient {
-        using F = std::function <bool()>;
-        using Observer = std::function <void(int)>;
-        
-        static_assert(
-                ::std::is_base_of <typename _Socket::value_type, TrainingTask::ISocket>::value
-            ,   "_Socket must be a descendant of ISocket."
-        );
-
     public:
         HttpStressClient() = default;
-        ~HttpStressClient() = default;
-
-        int64_t doStress(Observer observer) {
+        ~HttpStressClient() {
+            this->stop_();
         }
 
+        void doStress(const std::string& host, int port, const std::string& query);
+
+        constexpr void clear() {
+            this->total_    = 0;
+            this->failuer_  = 0;
+            this->error_    = 0;
+            this->success_  = 0;
+        }
+
+        constexpr int64_t total() const { return this->total_; }
+        constexpr int64_t failuer() const { return this->failuer_; }
+        constexpr int64_t error() const { return this->error_; }
+        constexpr int64_t success() const { return this->success_; }
+                        
         void stop() {
-            //Push to stop function
-            this->queue_.push([] { return true; });
+            this->running_.store(false);
         }
 
     private:
-        std::unique_ptr <_Socket> socket_;
+        std::atomic <bool> running_{false};
+        int64_t total_{0};
+        int64_t failuer_{0};
+        int64_t error_{0};
+        int64_t success_{0};
     };
 
 };

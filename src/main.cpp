@@ -1,70 +1,10 @@
 ﻿#include <atomic>
-#include <iostream>
-#include <type_traits>
-#include <iterator>
-#include <regex>
 #include <thread>
-#include "client/http_client.h"
-#include "common/common.h"
-#include "socket/socket.h"
+#include "client/http_stress_client.h"
 
-class GetClient {
-public:
-    bool doGet(
-        std::string host,
-        int port,
-        std::function <bool()> exiter
-    ) {
-        TrainingTask::Socket s;
-        if (s.initialize()) {
-            std::regex pattern(u8"^HTTP/1.1 (.*) (.*) (.*)");
-            std::smatch match;
-            if (s.connect(host, port)) {
-                //while (!exiter())
-                {
-                    auto req = TrainingTask::toString(
-                        "GET", " / ", "HTTP/1.1",
-                        "\r\nHost: ", host,
-                        "\r\n\r\n"
-                    );
-
-                    auto ss = s.write(TrainingTask::toByteBuf(req));
-                    auto pp = s.read(10000);
-                    auto httpResponseHeader = std::string{ pp.data() };
-
-                    if (std::regex_search(httpResponseHeader, match, pattern)) {
-                        auto responseCode = std::string{ *(match.begin() + 1) };
-                        ++this->successCounter_;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    constexpr auto successCount() const {
-        return this->successCounter_;
-    }
-
-private:
-    //TrainingTask::Socket socket_;
-    int64_t successCounter_{ 0 };
-};
-
-
-constexpr auto isSuccess(int responseCode) {
-    return (200 <= responseCode && 300 > responseCode);
-}
-
-void usage() {
-    std::cerr << "tcp [host] [exec time(ms)]" << std::endl;
-}
-
-void fs() {
-}
-
-void observer(int responseCode) {
-    std::cout << "responseCode: " << responseCode << std::endl;
+auto execute(const std::string& host, int port, const std::string& query) {
+    auto client = std::make_unique <TrainingTask::HttpStressClient> ();
+    return client;
 }
 
 int main(int argc, char** argv) {
@@ -73,17 +13,20 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
+    std::string host{ argv[1] };
+    auto times = std::chrono::milliseconds{ std::atoi(argv[2]) };
+
     //URLを分解
     std::regex pattern(u8"(.*)://(.*)/(.*)$");
 
     std::smatch match;
-//    std::string h{"http://www.yahoo.co.jp/aaaa.ddd.wlqoq?23939=aaaa"};
     std::string h{"http://www.yahoo.co.jp/"};
                     if (std::regex_search(h, match, pattern)) {
 for (auto each : match) {
     std::cout << each << std::endl;
 }
                     }
+
 
 for (;;) {
 auto r = TrainingTask::HttpClient <TrainingTask::Socket> {}.doGet(
