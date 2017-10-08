@@ -109,7 +109,7 @@ bool SocketPosix::connect(const std::string& host, int port) {
                 struct sockaddr_in info;
 
                 info.sin_family = AF_INET;
-                info.sin_port = ::htons(port);
+                info.sin_port = htons(port);
                 info.sin_addr.s_addr = *(unsigned int *)byName->h_addr_list[0];
 
                 return 0 == ::connect(s, (struct sockaddr *)&info, sizeof(info));

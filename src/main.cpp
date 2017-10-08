@@ -1,10 +1,17 @@
 ﻿#include <atomic>
+#include <chrono>
+#include <iostream>
 #include <thread>
+#include <regex>
 #include "client/http_stress_client.h"
 
 auto execute(const std::string& host, int port, const std::string& query) {
     auto client = std::make_unique <TrainingTask::HttpStressClient> ();
     return client;
+}
+
+void usage() {
+    std::cerr << "http_stress_client [host] [exec time(ms)]" << std::endl;
 }
 
 int main(int argc, char** argv) {
@@ -27,19 +34,11 @@ for (auto each : match) {
 }
                     }
 
-
-for (;;) {
-auto r = TrainingTask::HttpClient <TrainingTask::Socket> {}.doGet(
-"www.yahoo.co.jp"
-, 80
-, "/testtesttest"
-);
-
-auto rr =std::move(r);
-}
+TrainingTask::HttpStressClient{}.doStress("www.yahoo.co.jp", 80, "/");
     return 0;
 
 
+#if 0
     std::string host{ argv[1] };
     auto times = std::chrono::milliseconds{ std::atoi(argv[2]) };
 
@@ -101,5 +100,6 @@ auto rr =std::move(r);
     std::cout << "Counter:  " << std::to_string(counter_) << std::endl;
     //全てのClientに完了を通知。
     return 0;
+#endif
 }
 
