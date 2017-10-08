@@ -5,9 +5,9 @@
 #include <regex>
 #include "client/http_stress_client.h"
 
-auto execute(const std::string& host, int port, const std::string& query) {
-    auto client = std::make_unique <flowTumn::HttpStressClient> ();
-    return client;
+template <typename ... Args>
+auto execute(flowTumn::HttpStressClient& client, Args&&... args) {
+    return client.doStress(std::forward <Args> (args)...);
 }
 
 void usage() {
@@ -22,73 +22,56 @@ int main(int argc, char** argv) {
 
     std::string host{ argv[1] };
     auto times = std::chrono::milliseconds{ std::atoi(argv[2]) };
+    std::string query{};
+    int port = 80;
 
     //URLを分解
     std::regex pattern(u8"(.*)://(.*)/(.*)$");
 
     std::smatch match;
     std::string h{"http://www.yahoo.co.jp/"};
-                    if (std::regex_search(h, match, pattern)) {
-for (auto each : match) {
-    std::cout << each << std::endl;
-}
-                    }
+    if (std::regex_search(h, match, pattern)) {
+        for (auto each : match) {
+            std::cout << each << std::endl;
+        }
+    } else {
+        //分解出来なければ、host名のみとして処理。
+        query = "/";
+    }
 
-flowTumn::HttpStressClient{}.doStress("www.yahoo.co.jp", 80, "/");
-    return 0;
-
-
-#if 0
-    std::string host{ argv[1] };
-    auto times = std::chrono::milliseconds{ std::atoi(argv[2]) };
-
-    std::atomic <bool> stop_{ false };
-    std::atomic <int64_t> counter_{ 0 };
-
-    std::vector <std::thread> threads_;
-    auto N = std::thread::hardware_concurrency();
-    auto subscribe = [&counter_](int count) {
-        counter_ = counter_ + count;
-    };
-
+    //論理コア数分のClientを生成。
+    std::vector <std::unique_ptr <flowTumn::HttpStressClient>> clients;
     std::generate_n(
-        std::back_inserter(threads_),
-        N,
-        [&stop_, &subscribe] {
-            return std::thread{
-                [&stop_, &subscribe] {
-                    GetClient client;
-                    while (!stop_) {
-#if 1
-                        client.doGet(
-                            //"www.yahoo.co.jp",
-                            "www.apple.com",
-                            80,
-                            [&stop_] {
-                                return stop_.load();
-                            }
-                        );
-#else
-                        subscribe(
-                            func(
-                                [&stop_] {
-                                    return stop_.load();
-                                }
-                            )
-                        );
-#endif
-                    }
-                    subscribe(client.successCount());
-                }
-            };
+        std::back_inserter(clients),
+        std::thread::hardware_concurrency(),
+        [] {
+            return std::make_unique_ptr <flowTumn::HttpStressClient> ();
         }
     );
+
+    //生成したClientと同数のThreadを生成しexecute
+    std::vector <std::thread> threads_;
+    for (auto each : clients) {
+        threads_.emplace_back(
+            [&each, host, port, query] {
+                execute(**each, host, port, query);
+            }
+        );
+    }
 
     //待機。
     std::this_thread::sleep_for(times);
 
-    //終了
-    stop_.store(true);
+    //Shutdown.
+    std::for_each(
+        std::begin(clients),
+        std::end(clients),
+        [](auto& each) {
+            each->stop();
+        }
+    );
+
+    //Join
     std::for_each(
         std::begin(threads_),
         std::end(threads_),
@@ -97,9 +80,26 @@ flowTumn::HttpStressClient{}.doStress("www.yahoo.co.jp", 80, "/");
         }
     );
 
-    std::cout << "Counter:  " << std::to_string(counter_) << std::endl;
-    //全てのClientに完了を通知。
-    return 0;
-#endif
-}
+    //Report.
+    std::cout << "Result: " << host << "\n";
+    std::cout << "--------------------------------------\n";
+    {
+        int64_t total{0};
+        int64_t success{0};
+        int64_t error{0};
+        int64_t fail{0};
+        for (auto each : clients) {
+            total = total + each->total();
+            success = success + each->success();
+            error = error + each->error();
+            fail = fail + each->failuer();
+        }
 
+        std::cout << "Total Execute: " << total << "\n";
+        std::cout << "      Success: " << success << "\n";
+        std::cout << "        Error: " << error << "\n";
+        std::cout << "         Fail: " << fail << "\n";
+    }
+
+    return EXIT_SUCCESS;
+}
