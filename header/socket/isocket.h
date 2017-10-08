@@ -1,4 +1,4 @@
-#ifndef I_SOCKET_H_INCLUDE__
+﻿#ifndef I_SOCKET_H_INCLUDE__
 #define I_SOCKET_H_INCLUDE__
 
 #include <string>

@@ -1,6 +1,7 @@
-#ifndef HTTP_STRESS_CLIENT_H_INCLUDE__
+﻿#ifndef HTTP_STRESS_CLIENT_H_INCLUDE__
 #define HTTP_STRESS_CLIENT_H_INCLUDE__
 
+#include <functional>
 #include <memory>
 #include "socket/isocket.h"
 
@@ -39,4 +40,4 @@ namespace TrainingTask {
 
 };
 
-#endif HTTP_STRESS_CLIENT_H_INCLUDE__
+#endif //HTTP_STRESS_CLIENT_H_INCLUDE__

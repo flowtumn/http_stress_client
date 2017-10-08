@@ -1,4 +1,4 @@
-#ifndef SOCKET_POSIX_H_INCLUDE__
+Ôªø#ifndef SOCKET_POSIX_H_INCLUDE__
 #define SOCKET_POSIX_H_INCLUDE__
 
 #include <memory>
@@ -6,7 +6,7 @@
 
 namespace TrainingTask {
     /**
-     * Posixå¸ÇØÇÃSocketTCP-class
+     * PosixÂêë„Åë„ÅÆSocketTCP-class
      */
     class SocketPosix : public TrainingTask::ISocketTCP {
     public:

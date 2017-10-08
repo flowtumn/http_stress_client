@@ -1,4 +1,4 @@
-#include "socket/socket_win.h"
+ï»¿#include "socket/socket_win.h"
 
 #ifdef _WIN32
 
@@ -33,7 +33,7 @@ public:
     bool closeSocket() {
         return this->socketControll(
             [this](auto s) {
-                //unique_ptr‚ğ”jŠüB
+                //unique_ptrã‚’ç ´æ£„ã€‚
                 this->socket_.reset();
                 ::closesocket(s);
                 return true;

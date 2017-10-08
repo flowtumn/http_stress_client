@@ -1,4 +1,4 @@
-#ifndef COMMON_H_INCLUDE__
+﻿#ifndef COMMON_H_INCLUDE__
 #define COMMON_H_INCLUDE__
 
 #include <string>

@@ -1,4 +1,4 @@
-#ifndef SOCKET_WIN_H_INCLUDE__
+ï»¿#ifndef SOCKET_WIN_H_INCLUDE__
 #define SOCKET_WIN_H_INCLUDE__
 
 #include <memory>
@@ -6,7 +6,7 @@
 
 namespace TrainingTask {
     /**
-     * WindowsŒü‚¯‚ÌSocketTCP-class
+     * Windowså‘ã‘ã®SocketTCP-class
      */
     class SocketWin : public TrainingTask::ISocketTCP {
     public:

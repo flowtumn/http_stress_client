@@ -1,9 +1,11 @@
-#include <atomic>
+Ôªø#include <atomic>
 #include <iostream>
 #include <type_traits>
 #include <iterator>
 #include <regex>
 #include <thread>
+#include "client/http_client.h"
+#include "common/common.h"
 #include "socket/socket.h"
 
 class GetClient {
@@ -15,18 +17,18 @@ public:
     ) {
         TrainingTask::Socket s;
         if (s.initialize()) {
-            std::regex pattern(u8"^HTTP\/1\.1 (.*) (.*) (.*)");
+            std::regex pattern(u8"^HTTP/1.1 (.*) (.*) (.*)");
             std::smatch match;
             if (s.connect(host, port)) {
                 //while (!exiter())
                 {
-                    auto req = toString(
+                    auto req = TrainingTask::toString(
                         "GET", " / ", "HTTP/1.1",
                         "\r\nHost: ", host,
                         "\r\n\r\n"
                     );
 
-                    auto ss = s.write(toByteBuf(req));
+                    auto ss = s.write(TrainingTask::toByteBuf(req));
                     auto pp = s.read(10000);
                     auto httpResponseHeader = std::string{ pp.data() };
 
@@ -70,6 +72,30 @@ int main(int argc, char** argv) {
         usage();
         return EXIT_FAILURE;
     }
+
+    //URL„ÇíÂàÜËß£
+    std::regex pattern(u8"(.*)://(.*)/(.*)$");
+
+    std::smatch match;
+//    std::string h{"http://www.yahoo.co.jp/aaaa.ddd.wlqoq?23939=aaaa"};
+    std::string h{"http://www.yahoo.co.jp/"};
+                    if (std::regex_search(h, match, pattern)) {
+for (auto each : match) {
+    std::cout << each << std::endl;
+}
+                    }
+
+for (;;) {
+auto r = TrainingTask::HttpClient <TrainingTask::Socket> {}.doGet(
+"www.yahoo.co.jp"
+, 80
+, "/testtesttest"
+);
+
+auto rr =std::move(r);
+}
+    return 0;
+
 
     std::string host{ argv[1] };
     auto times = std::chrono::milliseconds{ std::atoi(argv[2]) };
@@ -116,10 +142,10 @@ int main(int argc, char** argv) {
         }
     );
 
-    //ë“ã@ÅB
+    //ÂæÖÊ©ü„ÄÇ
     std::this_thread::sleep_for(times);
 
-    //èIóπ
+    //ÁµÇ‰∫Ü
     stop_.store(true);
     std::for_each(
         std::begin(threads_),
@@ -130,11 +156,7 @@ int main(int argc, char** argv) {
     );
 
     std::cout << "Counter:  " << std::to_string(counter_) << std::endl;
-    //ëSÇƒÇÃClientÇ…äÆóπÇí ímÅB
+    //ÂÖ®„Å¶„ÅÆClient„Å´ÂÆå‰∫Ü„ÇíÈÄöÁü•„ÄÇ
     return 0;
-    
-    
-    
-    //URLÇï™â
-    std::regex pattern(u8"(.*):\/\/(.*)\/(.*)$");
 }
+
