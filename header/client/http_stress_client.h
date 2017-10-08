@@ -4,19 +4,39 @@
 #include <memory>
 #include "socket/isocket.h"
 
-template <typename _Socket>
-class HttpStressClient {
-    static_assert(
-            ::std::is_base_of <typename _Socket::value_type, TrainingTask::ISocket>::value
-        ,   "_Socket must be a descendant of ISocket."
-    );
+namespace TrainingTask {
+    struct StressObserver {
+        bool connection;
+        int connectionError;
+        int responseCode;
+    };
 
-public:
-    HttpStressClient() = default;
-    ~HttpStressClient() = default;
+    template <typename _Socket>
+    class HttpStressClient {
+        using F = std::function <bool()>;
+        using Observer = std::function <void(int)>;
+        
+        static_assert(
+                ::std::is_base_of <typename _Socket::value_type, TrainingTask::ISocket>::value
+            ,   "_Socket must be a descendant of ISocket."
+        );
 
-private:
-    std::unique_ptr <_Socket> socket_;
+    public:
+        HttpStressClient() = default;
+        ~HttpStressClient() = default;
+
+        int64_t doStress(Observer observer) {
+        }
+
+        void stop() {
+            //Push to stop function
+            this->queue_.push([] { return true; });
+        }
+
+    private:
+        std::unique_ptr <_Socket> socket_;
+    };
+
 };
 
 #endif HTTP_STRESS_CLIENT_H_INCLUDE__

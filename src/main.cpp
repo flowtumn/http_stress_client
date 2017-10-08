@@ -6,26 +6,6 @@
 #include <thread>
 #include "socket/socket.h"
 
-template <typename T>
-auto toByteBuf(T&& v) {
-    TrainingTask::ByteBuf r{};
-    for (auto each : v) {
-        r.emplace_back(each);
-    }
-    return r;
-}
-
-inline auto toString() { return std::string{}; }
-inline auto toString(std::string v) { return v; }
-inline auto toString(const char* p) {
-    return std::string{ p };
-}
-
-template <typename Head, typename ... Args>
-auto toString(Head&& head, Args&&... args) {
-    return toString(head) + toString(std::forward <Args>(args)...);
-}
-
 class GetClient {
 public:
     bool doGet(
@@ -81,6 +61,9 @@ void usage() {
 void fs() {
 }
 
+void observer(int responseCode) {
+    std::cout << "responseCode: " << responseCode << std::endl;
+}
 
 int main(int argc, char** argv) {
     if (3 != argc) {
@@ -149,4 +132,9 @@ int main(int argc, char** argv) {
     std::cout << "Counter:  " << std::to_string(counter_) << std::endl;
     //‘S‚Ä‚ÌClient‚ÉŠ®—¹‚ð’Ê’mB
     return 0;
+    
+    
+    
+    //URL‚ð•ª‰ð
+    std::regex pattern(u8"(.*):\/\/(.*)\/(.*)$");
 }

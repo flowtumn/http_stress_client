@@ -50,7 +50,9 @@ include_directories(${PROJECT_SOURCE_DIR}/header)
 set(
     SOURCES
     ${PROJECT_SOURCE_DIR}/src/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/client/http_client.cpp
     ${PROJECT_SOURCE_DIR}/src/client/http_stress_client.cpp
+    ${PROJECT_SOURCE_DIR}/src/common/common.cpp
     ${PROJECT_SOURCE_DIR}/src/socket/isocket.cpp
     ${PROJECT_SOURCE_DIR}/src/socket/socket.cpp
     ${PROJECT_SOURCE_DIR}/src/socket/socket_win.cpp
@@ -59,7 +61,9 @@ set(
 
 set (
     HEADERS
+    ${PROJECT_SOURCE_DIR}/header/client/http_client.h
     ${PROJECT_SOURCE_DIR}/header/client/http_stress_client.h
+    ${PROJECT_SOURCE_DIR}/header/common/common.h
     ${PROJECT_SOURCE_DIR}/header/socket/isocket.h
     ${PROJECT_SOURCE_DIR}/header/socket/socket.h
     ${PROJECT_SOURCE_DIR}/header/socket/socket_win.h
