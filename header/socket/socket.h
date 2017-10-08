@@ -3,13 +3,13 @@
 
 #ifdef _WIN32
     #include "socket_win.h"
-    namespace TrainingTask {
-        using Socket = TrainingTask::SocketWin;
+    namespace flowTumn {
+        using Socket = flowTumn::SocketWin;
     };
 #elif __linux__
     #include "socket_posix.h"
-    namespace TrainingTask {
-        using Socket = TrainingTask::SocketPosix;
+    namespace flowTumn {
+        using Socket = flowTumn::SocketPosix;
     };
 #else
     #error "Unsupport platform."

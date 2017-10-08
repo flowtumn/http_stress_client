@@ -5,7 +5,7 @@
 #include <cstdint>
 #include "socket/isocket.h"
 
-namespace TrainingTask {
+namespace flowTumn {
     class HttpStressClient {
     public:
         HttpStressClient() = default;

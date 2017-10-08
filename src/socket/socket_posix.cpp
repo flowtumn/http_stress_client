@@ -7,7 +7,7 @@
 #include <netdb.h>
 
 using SOCKET = int;
-using namespace TrainingTask;
+using namespace flowTumn;
 
 class SocketPosix::impl {
 friend class SocketPosix;

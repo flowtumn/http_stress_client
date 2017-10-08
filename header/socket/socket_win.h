@@ -4,11 +4,11 @@
 #include <memory>
 #include "isocket.h"
 
-namespace TrainingTask {
+namespace flowTumn {
     /**
      * Windows向けのSocketTCP-class
      */
-    class SocketWin : public TrainingTask::ISocketTCP {
+    class SocketWin : public flowTumn::ISocketTCP {
     public:
         SocketWin();
         ~SocketWin();

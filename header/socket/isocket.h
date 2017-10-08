@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace TrainingTask {
+namespace flowTumn {
     using Byte = char;
     using ByteBuf = std::vector <Byte>;
 

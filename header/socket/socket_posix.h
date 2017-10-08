@@ -4,11 +4,11 @@
 #include <memory>
 #include "isocket.h"
 
-namespace TrainingTask {
+namespace flowTumn {
     /**
      * Posix向けのSocketTCP-class
      */
-    class SocketPosix : public TrainingTask::ISocketTCP {
+    class SocketPosix : public flowTumn::ISocketTCP {
     public:
         SocketPosix();
         ~SocketPosix();

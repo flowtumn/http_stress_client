@@ -6,11 +6,11 @@
 #include "common/common.h"
 #include "socket/isocket.h"
 
-namespace TrainingTask {
+namespace flowTumn {
     template <typename _Socket>
     class HttpClient {
         static_assert(
-                ::std::is_base_of <TrainingTask::ISocket, _Socket>::value
+                ::std::is_base_of <flowTumn::ISocket, _Socket>::value
             ,   "_Socket must be a descendant of ISocket."
         );
 
@@ -30,7 +30,7 @@ namespace TrainingTask {
             }
 
             auto req = this->toGetRequest(host, query);
-            if (req.size() != s->write(TrainingTask::toByteBuf(req))) {
+            if (req.size() != s->write(flowTumn::toByteBuf(req))) {
                 throw std::runtime_error{"doGet write error."};
             }
 
@@ -39,7 +39,7 @@ namespace TrainingTask {
 
     private:
         constexpr std::string toGetRequest(const std::string& host, const std::string& query) const {
-            return TrainingTask::toString(
+            return flowTumn::toString(
                 "GET ", query, " ", "HTTP/1.1",
                 "\r\n", "Host: ", host,
                 "\r\n\r\n"

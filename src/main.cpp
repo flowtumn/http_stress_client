@@ -6,7 +6,7 @@
 #include "client/http_stress_client.h"
 
 auto execute(const std::string& host, int port, const std::string& query) {
-    auto client = std::make_unique <TrainingTask::HttpStressClient> ();
+    auto client = std::make_unique <flowTumn::HttpStressClient> ();
     return client;
 }
 
@@ -34,7 +34,7 @@ for (auto each : match) {
 }
                     }
 
-TrainingTask::HttpStressClient{}.doStress("www.yahoo.co.jp", 80, "/");
+flowTumn::HttpStressClient{}.doStress("www.yahoo.co.jp", 80, "/");
     return 0;
 
 

@@ -4,7 +4,7 @@
 #include <regex>
 #include "client/http_client.h"
 
-using namespace TrainingTask;
+using namespace flowTumn;
 
 void HttpStressClient::doStress(const std::string& host, int port, const std::string& query) {
     auto flg{false};
@@ -18,7 +18,7 @@ void HttpStressClient::doStress(const std::string& host, int port, const std::st
 
     for (;this->running_;) {
         try {
-            if (auto s = TrainingTask::HttpClient <TrainingTask::Socket>{}.doGet(host, port, query)) {
+            if (auto s = flowTumn::HttpClient <flowTumn::Socket>{}.doGet(host, port, query)) {
                 std::smatch match;
 
                 //doGetに成功したので、中身を確認。(ResponseCodeだけが知りたいので、128byteも読めば十分)

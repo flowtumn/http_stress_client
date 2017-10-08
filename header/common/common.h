@@ -4,11 +4,11 @@
 #include <string>
 #include "socket/socket.h"
 
-namespace TrainingTask {
+namespace flowTumn {
 
     template <typename T>
     auto toByteBuf(T&& v) {
-        TrainingTask::ByteBuf r{};
+        flowTumn::ByteBuf r{};
         for (auto each : v) {
             r.emplace_back(each);
         }

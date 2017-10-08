@@ -4,7 +4,7 @@
 
 #include <WinSock2.h>
 
-using namespace TrainingTask;
+using namespace flowTumn;
 
 class SocketWin::impl {
 friend class SocketWin;
