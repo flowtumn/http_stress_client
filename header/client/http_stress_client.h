@@ -27,9 +27,7 @@ namespace flowTumn {
          int64_t error() const { return this->error_; }
          int64_t success() const { return this->success_; }
                         
-        void stop() {
-            this->running_.store(false);
-        }
+        void stop();
 
     private:
         std::atomic <bool> running_{false};

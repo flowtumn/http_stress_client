@@ -30,7 +30,7 @@ namespace flowTumn {
             }
 
             auto req = this->toGetRequest(host, query);
-            if (req.size() != s->write(flowTumn::toByteBuf(req))) {
+            if (static_cast <int> (req.size()) != s->write(flowTumn::toByteBuf(req))) {
                 throw std::runtime_error{"doGet write error."};
             }
 

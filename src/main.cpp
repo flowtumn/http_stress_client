@@ -20,8 +20,9 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    std::string host{ argv[1] };
+    std::string url{ argv[1] };
     auto times = std::chrono::milliseconds{ std::atoi(argv[2]) };
+    std::string host{};
     std::string query{};
     int port = 80;
 
@@ -29,32 +30,40 @@ int main(int argc, char** argv) {
     std::regex pattern(u8"(.*)://(.*)/(.*)$");
 
     std::smatch match;
-    std::string h{"http://www.yahoo.co.jp/"};
-    if (std::regex_search(h, match, pattern)) {
-        for (auto each : match) {
-            std::cout << each << std::endl;
+    if (std::regex_search(url, match, pattern)) {
+		auto protocol = *(std::begin(match) + 1);
+        if ("http" != protocol) {
+            std::cerr << "Unsupport protocol " << protocol << std::endl;
+            return EXIT_FAILURE;
         }
+
+        host = *(std::begin(match) + 2);
+        query ="/" + std::string{ *(std::begin(match) + 3)};
     } else {
-        //分解出来なければ、host名のみとして処理。
+        //分解出来なければ、host名のみとし扱い、GETパスは"/"。
+        host = url;
         query = "/";
     }
+
 
     //論理コア数分のClientを生成。
     std::vector <std::unique_ptr <flowTumn::HttpStressClient>> clients;
     std::generate_n(
         std::back_inserter(clients),
-        std::thread::hardware_concurrency(),
+//        std::thread::hardware_concurrency(),
+		8,
         [] {
-            return std::make_unique_ptr <flowTumn::HttpStressClient> ();
+            return std::make_unique <flowTumn::HttpStressClient> ();
         }
     );
 
     //生成したClientと同数のThreadを生成しexecute
     std::vector <std::thread> threads_;
-    for (auto each : clients) {
+    for (auto& each : clients) {
         threads_.emplace_back(
             [&each, host, port, query] {
-                execute(**each, host, port, query);
+//                execute(*each, host, port, query);
+				each->doStress(host, port, query);
             }
         );
     }
@@ -88,7 +97,7 @@ int main(int argc, char** argv) {
         int64_t success{0};
         int64_t error{0};
         int64_t fail{0};
-        for (auto each : clients) {
+        for (auto& each : clients) {
             total = total + each->total();
             success = success + each->success();
             error = error + each->error();
@@ -103,3 +112,4 @@ int main(int argc, char** argv) {
 
     return EXIT_SUCCESS;
 }
+

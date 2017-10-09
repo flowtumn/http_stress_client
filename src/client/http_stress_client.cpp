@@ -6,6 +6,13 @@
 
 using namespace flowTumn;
 
+void HttpStressClient::stop() {
+    auto flg{true};
+    if (!this->running_.compare_exchange_weak(flg, false)) {
+		return;
+    }
+}
+
 void HttpStressClient::doStress(const std::string& host, int port, const std::string& query) {
     auto flg{false};
     if (!this->running_.compare_exchange_weak(flg, true)) {
@@ -18,17 +25,18 @@ void HttpStressClient::doStress(const std::string& host, int port, const std::st
 
     for (;this->running_;) {
         try {
+			++this->total_;
             if (auto s = flowTumn::HttpClient <flowTumn::Socket>{}.doGet(host, port, query)) {
                 std::smatch match;
 
-                //doGetに成功したので、中身を確認。(ResponseCodeだけが知りたいので、128byteも読めば十分)
-                auto buf = s->read(128);
-                auto httpResponseHeader = std::string{ buf.data() };
+                //doGetに成功したので、中身を確認。(ResponseCodeだけが知りたいので、20byteも読めば十分)
+                auto buf = s->read(20);
+                auto httpResponseHeader = std::string{ buf.data(), buf.size() };
 
                 if (std::regex_search(httpResponseHeader, match, pattern)) {
                     auto responseCode = std::atoi(std::string{ *(match.begin() + 1) }.c_str());
-                    if (200 >= responseCode && responseCode < 300) {
-                        //200番台は成功。
+                    if (200 <= responseCode && responseCode < 400) {
+                        //200番、300番台は成功。
                         ++this->success_;
                         continue;
                     }
@@ -46,6 +54,5 @@ void HttpStressClient::doStress(const std::string& host, int port, const std::st
             std::cerr << e.what() << std::endl;
         }
     }
-
-    this->running_.store(false);
 }
+
