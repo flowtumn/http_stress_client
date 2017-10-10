@@ -9,28 +9,28 @@ using namespace flowTumn;
 void HttpStressClient::stop() {
     auto flg{true};
     if (!this->running_.compare_exchange_weak(flg, false)) {
-		return;
+        return;
     }
 }
 
 void HttpStressClient::doStress(const std::string& host, int port, const std::string& query) {
     auto flg{false};
     if (!this->running_.compare_exchange_weak(flg, true)) {
-		return;
+        return;
     }
 
     this->clear();
 
-    std::regex pattern(u8"^HTTP/1.1 (.*) (.*)");
+    std::regex pattern(u8"^HTTP/1.1 ([0-9]{3})");
 
     for (;this->running_;) {
         try {
-			++this->total_;
+            ++this->total_;
             if (auto s = flowTumn::HttpClient <flowTumn::Socket>{}.doGet(host, port, query)) {
                 std::smatch match;
 
-                //doGetに成功したので、中身を確認。(ResponseCodeだけが知りたいので、20byteも読めば十分)
-                auto buf = s->read(20);
+                //doGetに成功したので、中身を確認。(ResponseCodeだけが知りたいので、12byteも読めば十分)
+                auto buf = s->read(12);
                 auto httpResponseHeader = std::string{ buf.data(), buf.size() };
 
                 if (std::regex_search(httpResponseHeader, match, pattern)) {

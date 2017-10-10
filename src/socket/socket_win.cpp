@@ -109,7 +109,7 @@ bool SocketWin::connect(const std::string& host, int port) {
                 struct sockaddr_in info;
 
                 info.sin_family = AF_INET;
-                info.sin_port = static_cast <USHORT> (::htons(port) & 0xFFFF);
+                info.sin_port = ::htons(static_cast <USHORT> (port & 0xFFFF));
                 info.sin_addr.S_un.S_addr = *((unsigned long *)(byName->h_addr));
 
                 return 0 == ::connect(s, (struct sockaddr *)&info, sizeof(info));

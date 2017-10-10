@@ -27,31 +27,33 @@ int main(int argc, char** argv) {
     int port = 80;
 
     //URLを分解
-    std::regex pattern(u8"(.*)://(.*)/(.*)$");
+    std::regex pattern(u8"^(.*)://([^/]+)(.*)");
 
     std::smatch match;
     if (std::regex_search(url, match, pattern)) {
-		auto protocol = *(std::begin(match) + 1);
+        auto protocol = *(std::begin(match) + 1);
         if ("http" != protocol) {
             std::cerr << "Unsupport protocol " << protocol << std::endl;
             return EXIT_FAILURE;
         }
 
         host = *(std::begin(match) + 2);
-        query ="/" + std::string{ *(std::begin(match) + 3)};
+        query = std::string{ *(std::begin(match) + 3)};
     } else {
-        //分解出来なければ、host名のみとし扱い、GETパスは"/"。
+        //分解出来なければhost名として扱う。
         host = url;
-        query = "/";
     }
 
+    //GETメソッドのpathが空なら、 "/" 指定
+    if (query.empty()) {
+        query = "/";
+    }
 
     //論理コア数分のClientを生成。
     std::vector <std::unique_ptr <flowTumn::HttpStressClient>> clients;
     std::generate_n(
         std::back_inserter(clients),
-//        std::thread::hardware_concurrency(),
-		8,
+        std::thread::hardware_concurrency(),
         [] {
             return std::make_unique <flowTumn::HttpStressClient> ();
         }
@@ -62,8 +64,7 @@ int main(int argc, char** argv) {
     for (auto& each : clients) {
         threads_.emplace_back(
             [&each, host, port, query] {
-//                execute(*each, host, port, query);
-				each->doStress(host, port, query);
+                execute(*each, host, port, query);
             }
         );
     }
@@ -90,7 +91,7 @@ int main(int argc, char** argv) {
     );
 
     //Report.
-    std::cout << "Result: " << host << "\n";
+    std::cout << "Result: " << url << "\n";
     std::cout << "--------------------------------------\n";
     {
         int64_t total{0};
